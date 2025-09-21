@@ -1,0 +1,12 @@
+---
+alwaysApply: true
+---
+
+- make sure the code respect the clean code principles
+- make sure the code is dry
+- make sure the code is maintainable
+- make sure the code is scalable
+- make sure the code is testable
+- make sure the code is readable
+- code will be scanned by sonarqube to check the code quality, always make sure the code respect the basic sonarqube rules
+- avoid pointless comments in code. Only documentation otherwise nothing

@@ -1,0 +1,196 @@
+<div class="admin-dashboard">
+  <!-- Loading State -->
+  <div *ngIf="!(isInitialized$ | async)" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="isInitialized$ | async">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="title">Admin Dashboard</h1>
+        <div class="user-info" *ngIf="currentUser$ | async as user">
+          <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+          <span class="role-badge admin">{{ user.role }}</span>
+        </div>
+      </div>
+    </header>
+
+  <!-- Navigation -->
+  <nav class="nav-tabs">
+    <button 
+      class="tab-btn" 
+      [class.active]="selectedTab === 'logs'"
+      (click)="setTab('logs')">
+      Request Logs
+    </button>
+    <button 
+      class="tab-btn" 
+      [class.active]="selectedTab === 'stats'"
+      (click)="setTab('stats')">
+      System Statistics
+    </button>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Logs Tab -->
+    <section *ngIf="selectedTab === 'logs'" class="logs-section">
+      <div class="section-header">
+        <h2>Request Logs</h2>
+        <div class="controls">
+          <div class="input-group">
+            <label for="logsLimit">Limit</label>
+            <input 
+              id="logsLimit"
+              type="number" 
+              [(ngModel)]="logsLimit" 
+              min="1" 
+              max="1000"
+              class="input">
+          </div>
+          <button (click)="loadRequestLogs()" class="btn primary">Refresh</button>
+        </div>
+      </div>
+
+      <!-- User Filter -->
+      <div class="filter-section">
+        <div class="input-group">
+          <label for="userId">Filter by User ID</label>
+          <input 
+            id="userId"
+            type="text" 
+            [(ngModel)]="selectedUserId" 
+            placeholder="Enter user ID"
+            class="input">
+          <button (click)="loadUserLogs()" class="btn secondary">Filter</button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading request logs...</p>
+      </div>
+
+      <!-- Error State -->
+      <div *ngIf="error" class="error-state">
+        <div class="error-icon">⚠️</div>
+        <p>{{ error }}</p>
+        <button class="btn secondary" (click)="loadRequestLogs()">Retry</button>
+      </div>
+
+      <!-- Logs Table -->
+      <div *ngIf="!loading && !error" class="logs-container">
+        <div class="table-wrapper">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Method</th>
+                <th>Path</th>
+                <th>Status</th>
+                <th>Response Time</th>
+                <th>IP Address</th>
+                <th>User ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let log of requestLogs" class="log-row">
+                <td class="timestamp">{{ formatTimestamp(log.timestamp) }}</td>
+                <td>
+                  <span class="method-badge" [class]="getMethodClass(log.method)">
+                    {{ log.method }}
+                  </span>
+                </td>
+                <td class="path">{{ log.path }}</td>
+                <td>
+                  <span class="status-badge" [class]="getStatusClass(log.status_code)">
+                    {{ log.status_code }}
+                  </span>
+                </td>
+                <td class="response-time">{{ log.response_time_ms }}ms</td>
+                <td class="ip-address">{{ log.ip_address }}</td>
+                <td class="user-id">{{ log.user_id || 'Anonymous' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div *ngIf="requestLogs.length === 0" class="empty-state">
+          <div class="empty-icon">📝</div>
+          <p>No request logs found</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats Tab -->
+    <section *ngIf="selectedTab === 'stats'" class="stats-section">
+      <div class="section-header">
+        <h2>System Statistics</h2>
+        <button (click)="loadSystemStats()" class="btn primary">Refresh</button>
+      </div>
+
+      <div *ngIf="systemStats" class="stats-grid">
+        <!-- Total Requests -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Total Requests</h3>
+            <div class="stat-icon">📊</div>
+          </div>
+          <div class="stat-value">{{ systemStats.total_requests }}</div>
+        </div>
+
+        <!-- Status Codes -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Status Codes</h3>
+            <div class="stat-icon">🎯</div>
+          </div>
+          <div class="stat-breakdown">
+            <div *ngFor="let status of systemStats.status_codes | keyvalue" class="breakdown-item">
+              <span class="label">{{ status.key }}</span>
+              <span class="value">{{ status.value }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- HTTP Methods -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>HTTP Methods</h3>
+            <div class="stat-icon">🔧</div>
+          </div>
+          <div class="stat-breakdown">
+            <div *ngFor="let method of systemStats.methods | keyvalue" class="breakdown-item">
+              <span class="label">{{ method.key }}</span>
+              <span class="value">{{ method.value }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Paths -->
+        <div class="stat-card">
+          <div class="stat-header">
+            <h3>Top Paths</h3>
+            <div class="stat-icon">🛣️</div>
+          </div>
+          <div class="stat-breakdown">
+            <div *ngFor="let path of systemStats.top_paths | keyvalue" class="breakdown-item">
+              <span class="label">{{ path.key }}</span>
+              <span class="value">{{ path.value }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!systemStats" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading system statistics...</p>
+      </div>
+    </section>
+  </main>
+  </div>
+</div>

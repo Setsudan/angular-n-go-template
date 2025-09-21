@@ -64,6 +64,11 @@ func InternalServerErrorResponse(requestID string, message string) APIResponse {
 	return ErrorResponse(requestID, "INTERNAL_SERVER_ERROR", "Internal server error", message)
 }
 
+// ForbiddenErrorResponse creates a forbidden error API response
+func ForbiddenErrorResponse(requestID string) APIResponse {
+	return ErrorResponse(requestID, "FORBIDDEN", "Access forbidden", "")
+}
+
 
 
 

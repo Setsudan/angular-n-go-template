@@ -4,8 +4,10 @@ import (
 	"log"
 	"os"
 
+	"angular-n-go-template/backend/config"
 	"angular-n-go-template/backend/controllers"
 	"angular-n-go-template/backend/middleware"
+	"angular-n-go-template/backend/rbac"
 	"angular-n-go-template/backend/repositories"
 	"angular-n-go-template/backend/security"
 	"angular-n-go-template/backend/services"
@@ -37,59 +39,41 @@ func main() {
 	authService := services.NewAuthService(userRepo, requestLogRepo)
 	userService := services.NewUserService(userRepo)
 	requestLogService := services.NewRequestLogService(requestLogRepo)
+	adminSeedService := services.NewAdminSeedService(userRepo)
+
+	// Seed default admin account if configured
+	if err := adminSeedService.SeedDefaultAdmin(); err != nil {
+		log.Printf("Failed to seed default admin account: %v", err)
+	}
 
 	// Initialize controllers
 	authController := controllers.NewAuthController(authService, requestLogService)
 	userController := controllers.NewUserController(userService, requestLogService)
+	adminController := controllers.NewAdminController(requestLogService)
+
+	// Initialize RBAC configuration
+	rbacConfig := rbac.DefaultRBACConfig()
 
 	// Initialize Gin router
 	router := gin.Default()
 
 	// CORS configuration
-	config := cors.DefaultConfig()
+	corsConfig := cors.DefaultConfig()
 	corsOrigin := os.Getenv("CORS_ORIGIN")
 	if corsOrigin == "" {
 		corsOrigin = "http://localhost:4200"
 	}
-	config.AllowOrigins = []string{corsOrigin}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"}
-	config.AllowCredentials = true
-	router.Use(cors.New(config))
+	corsConfig.AllowOrigins = []string{corsOrigin}
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization", "X-Requested-With"}
+	corsConfig.AllowCredentials = true
+	router.Use(cors.New(corsConfig))
 
 	// Middleware
 	router.Use(middleware.RequestLogger(requestLogService))
 
-	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status":  "ok",
-			"service": "angular-n-go-template",
-		})
-	})
-
-	// API routes
-	api := router.Group("/api/v1")
-	{
-		// Auth routes (public)
-		auth := api.Group("/auth")
-		{
-			auth.POST("/register", authController.Register)
-			auth.POST("/login", authController.Login)
-			auth.GET("/profile", middleware.AuthMiddleware(), authController.GetProfile)
-			auth.POST("/logout", middleware.AuthMiddleware(), authController.Logout)
-		}
-
-		// User routes (protected)
-		users := api.Group("/users")
-		users.Use(middleware.AuthMiddleware())
-		{
-			users.GET("", userController.GetUsers)
-			users.GET("/:id", userController.GetUser)
-			users.PUT("/:id", userController.UpdateUser)
-			users.DELETE("/:id", userController.DeleteUser)
-		}
-	}
+	// Setup routes with configurable RBAC
+	config.SetupRoutes(router, authController, userController, adminController, rbacConfig)
 
 	// Get port from environment or use default
 	port := os.Getenv("PORT")

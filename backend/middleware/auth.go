@@ -43,6 +43,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("userID", claims.UserID)
 		c.Set("userEmail", claims.Email)
 		c.Set("username", claims.Username)
+		c.Set("userRole", claims.Role)
 
 		c.Next()
 	}
@@ -78,11 +79,34 @@ func OptionalAuthMiddleware() gin.HandlerFunc {
 		c.Set("userID", claims.UserID)
 		c.Set("userEmail", claims.Email)
 		c.Set("username", claims.Username)
+		c.Set("userRole", claims.Role)
 
 		c.Next()
 	}
 }
 
+// RoleMiddleware checks if the user has the required role
+func RoleMiddleware(requiredRole string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("userRole")
+		if !exists {
+			c.JSON(http.StatusForbidden, models.ForbiddenErrorResponse(c.GetString("requestId")))
+			c.Abort()
+			return
+		}
 
+		role, ok := userRole.(string)
+		if !ok || role != requiredRole {
+			c.JSON(http.StatusForbidden, models.ForbiddenErrorResponse(c.GetString("requestId")))
+			c.Abort()
+			return
+		}
 
+		c.Next()
+	}
+}
 
+// AdminMiddleware checks if the user is an admin
+func AdminMiddleware() gin.HandlerFunc {
+	return RoleMiddleware("admin")
+}

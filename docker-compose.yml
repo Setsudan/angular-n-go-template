@@ -39,6 +39,8 @@ services:
       context: ./backend
       dockerfile: Dockerfile
     container_name: angular-n-go-backend
+    env_file:
+      - .env
     environment:
       DATABASE_URL: postgres://user:password@postgres:5432/angular_n_go_template?sslmode=disable
       REDIS_URL: redis://redis:6379
@@ -47,6 +49,13 @@ services:
       PORT: 8080
       GIN_MODE: release
       CORS_ORIGIN: http://localhost:4200
+      # Default Admin Account Configuration (optional)
+      # These can be overridden by .env file
+      DEFAULT_ADMIN_EMAIL: admin@example.com
+      DEFAULT_ADMIN_USERNAME: admin
+      DEFAULT_ADMIN_PASSWORD: admin123456
+      DEFAULT_ADMIN_FIRST_NAME: System
+      DEFAULT_ADMIN_LAST_NAME: Administrator
     ports:
       - "8080:8080"
     depends_on:

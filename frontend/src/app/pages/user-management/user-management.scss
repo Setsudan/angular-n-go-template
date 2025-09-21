@@ -1,0 +1,171 @@
+@use 'sass:map';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use '../../../styles/typography' as *;
+
+.user-management {
+  min-height: 100vh;
+  background: $bg-primary;
+  font-family: $font-primary;
+
+  .header {
+    @include glass-effect(0.1, 20px, 0.2);
+    padding: $spacing-xl;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+
+    .title {
+      @include heading-style('3xl', 'bold', $text-primary);
+      margin: 0 0 $spacing-sm 0;
+    }
+
+    .subtitle {
+      @include body-text('lg', $text-secondary);
+      margin: 0;
+    }
+  }
+
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-xl;
+  }
+
+  .loading-state {
+    @include loading-state();
+  }
+
+  .error-state {
+    @include error-state();
+    gap: $spacing-md;
+
+    .retry-btn {
+      @include glass-button($spacing-sm $spacing-lg, $radius-md);
+      margin-top: $spacing-md;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  .users-section {
+    .users-header {
+      @include flex-between;
+      margin-bottom: $spacing-xl;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+
+      h2 {
+        @include heading-style('2xl', 'semibold', $text-primary);
+        margin: 0;
+      }
+
+      .user-count {
+        @include badge(#000000, #000000);
+        font-size: map.get($font-sizes, 'sm');
+      }
+    }
+
+    .users-grid {
+      @include grid-auto-fit(350px, $spacing-lg);
+
+      .user-card {
+        @include glass-card($spacing-lg, $radius-lg);
+        transition: all $transition-normal;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: $shadow-xl;
+        }
+
+        .user-avatar {
+          @include flex-center;
+          width: 60px;
+          height: 60px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.1);
+          border: 2px solid rgba(0, 0, 0, 0.2);
+          margin: 0 auto $spacing-md auto;
+
+          .avatar-text {
+            @include heading-style('xl', 'bold', $text-primary);
+            text-transform: uppercase;
+          }
+        }
+
+        .user-info {
+          text-align: center;
+          margin-bottom: $spacing-md;
+
+          .user-name {
+            @include heading-style('lg', 'semibold', $text-primary);
+            margin: 0 0 $spacing-xs 0;
+          }
+
+          .username {
+            @include body-text('sm', $text-muted);
+            margin: 0 0 $spacing-xs 0;
+          }
+
+          .email {
+            @include body-text('base', $text-secondary);
+            margin: 0;
+            word-break: break-all;
+          }
+        }
+
+        .user-meta {
+          @include flex-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: $spacing-sm;
+
+          .role-badge {
+            @include badge(#000000, #000000);
+            font-size: map.get($font-sizes, 'sm');
+          }
+
+          .created-date {
+            @include caption-text($text-muted);
+            font-size: map.get($font-sizes, 'xs');
+          }
+        }
+      }
+    }
+
+    .empty-state {
+      @include empty-state();
+    }
+  }
+
+  @include mobile {
+    .header {
+      padding: $spacing-lg;
+    }
+
+    .main-content {
+      padding: $spacing-md;
+    }
+
+    .users-section {
+      .users-header {
+        @include flex-column;
+        text-align: center;
+        gap: $spacing-sm;
+      }
+
+      .users-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .user-card {
+        .user-meta {
+          @include flex-column;
+          align-items: center;
+          gap: $spacing-xs;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,340 @@
+@use 'sass:map';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use '../../../styles/typography' as *;
+
+.admin-dashboard {
+  min-height: 100vh;
+  background: $bg-primary;
+  font-family: $font-primary;
+
+  .header {
+    @include glass-effect(0.1, 20px, 0.2);
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .header-content {
+      @include flex-between;
+      max-width: 1400px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+
+      .title {
+        @include heading-style('2xl', 'bold', $text-primary);
+        margin: 0;
+      }
+
+      .user-info {
+        @include flex-center;
+        gap: $spacing-md;
+        flex-wrap: wrap;
+
+        .user-name {
+          @include body-text('base', $text-secondary);
+        }
+
+        .role-badge {
+          @include badge(#000000, #000000);
+        }
+      }
+    }
+  }
+
+  .nav-tabs {
+    @include glass-effect(0.05, 20px, 0.1);
+    padding: $spacing-md $spacing-xl;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    gap: $spacing-md;
+    max-width: 1400px;
+    margin: 0 auto;
+
+    .tab-btn {
+      @include glass-button($spacing-sm $spacing-lg, $radius-md);
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: $text-muted;
+      transition: all $transition-normal;
+
+      &.active {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: rgba(255, 255, 255, 0.2);
+        color: $text-primary;
+      }
+
+      &:hover:not(.active) {
+        background: rgba(255, 255, 255, 0.05);
+        color: $text-secondary;
+      }
+    }
+  }
+
+  .main-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: $spacing-xl;
+  }
+
+  .section-header {
+    @include flex-between;
+    margin-bottom: $spacing-xl;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+
+    h2 {
+      @include heading-style('xl', 'semibold', $text-primary);
+      margin: 0;
+    }
+
+    .controls {
+      @include flex-center;
+      gap: $spacing-md;
+      flex-wrap: wrap;
+
+      .input-group {
+        @include flex-center;
+        gap: $spacing-sm;
+
+        label {
+          @include body-text('sm', $text-secondary);
+          white-space: nowrap;
+        }
+
+        .input {
+          @include glass-input($spacing-xs $spacing-sm, $radius-sm);
+          width: 80px;
+          font-size: map.get($font-sizes, 'sm');
+        }
+      }
+    }
+  }
+
+  .filter-section {
+    @include glass-card($spacing-lg, $radius-lg);
+    margin-bottom: $spacing-xl;
+    background: rgba(255, 255, 255, 0.05);
+
+    .input-group {
+      @include flex-center;
+      gap: $spacing-md;
+      flex-wrap: wrap;
+
+      label {
+        @include body-text('sm', $text-secondary);
+        min-width: 100px;
+      }
+
+      .input {
+        @include glass-input($spacing-sm $spacing-md, $radius-md);
+        min-width: 200px;
+      }
+    }
+  }
+
+  .loading-state {
+    @include loading-state();
+  }
+
+  .error-state {
+    @include error-state();
+    gap: $spacing-md;
+
+    .btn {
+      margin-top: $spacing-md;
+    }
+  }
+
+  .logs-container {
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: $radius-lg;
+      @include glass-effect(0.05, 20px, 0.1);
+    }
+
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+      color: $text-primary;
+
+      th {
+        @include glass-effect(0.1, 20px, 0.1);
+        padding: $spacing-md;
+        text-align: left;
+        @include body-text('sm', $text-secondary);
+        font-weight: map.get($font-weights, 'semibold');
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      td {
+        padding: $spacing-md;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        @include body-text('sm');
+      }
+
+      .log-row:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .timestamp, .path, .response-time, .ip-address, .user-id {
+        @include mono-text('sm', $text-muted);
+      }
+
+      .path {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .empty-state {
+      @include empty-state();
+    }
+  }
+
+  .stats-grid {
+    @include grid-auto-fit(300px, $spacing-lg);
+
+    .stat-card {
+      @include glass-card($spacing-lg, $radius-lg);
+      transition: all $transition-normal;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: $shadow-xl;
+      }
+
+      .stat-header {
+        @include flex-between;
+        align-items: center;
+        margin-bottom: $spacing-md;
+
+        h3 {
+          @include heading-style('base', 'semibold', $text-primary);
+          margin: 0;
+        }
+
+        .stat-icon {
+          font-size: 1.5rem;
+        }
+      }
+
+      .stat-value {
+        @include heading-style('3xl', 'bold', $text-primary);
+        text-align: center;
+        margin-bottom: $spacing-md;
+      }
+
+      .stat-breakdown {
+        @include flex-column;
+        gap: $spacing-sm;
+
+        .breakdown-item {
+          @include flex-between;
+          padding: $spacing-sm;
+          @include glass-effect(0.05, 20px, 0.1);
+          border-radius: $radius-sm;
+
+          .label {
+            @include body-text('sm', $text-secondary);
+          }
+
+          .value {
+            @include mono-text('sm', $text-muted);
+          }
+        }
+      }
+    }
+  }
+
+  // Button styles
+  .btn {
+    @include glass-button($spacing-sm $spacing-md, $radius-md);
+    font-size: map.get($font-sizes, 'sm');
+
+    &.primary {
+      background: rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.15);
+      }
+    }
+
+    &.secondary {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  // Status and method badges - Minimalistic
+  .status-badge, .method-badge {
+    @include badge(#000000, #000000);
+    font-size: map.get($font-sizes, 'xs');
+    padding: $spacing-xs $spacing-sm;
+  }
+
+  @include mobile {
+    .header {
+      padding: $spacing-md;
+
+      .header-content {
+        @include flex-column;
+        text-align: center;
+        gap: $spacing-sm;
+      }
+    }
+
+    .nav-tabs {
+      padding: $spacing-md;
+      @include flex-column;
+
+      .tab-btn {
+        justify-content: center;
+      }
+    }
+
+    .main-content {
+      padding: $spacing-md;
+    }
+
+    .section-header {
+      @include flex-column;
+      align-items: stretch;
+      gap: $spacing-md;
+
+      .controls {
+        justify-content: center;
+      }
+    }
+
+    .filter-section {
+      .input-group {
+        @include flex-column;
+        align-items: stretch;
+        gap: $spacing-sm;
+
+        .input {
+          min-width: auto;
+        }
+      }
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .logs-table {
+      @include body-text('xs');
+
+      th, td {
+        padding: $spacing-sm;
+      }
+    }
+  }
+}

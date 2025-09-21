@@ -1,0 +1,200 @@
+@use 'sass:math';
+@use 'sass:map';
+@use 'variables' as *;
+@use 'typography' as *;
+
+// Glass Effect Mixin - Minimalistic
+@mixin glass-effect($opacity: 0.05, $blur: 10px, $border-opacity: 0.1) {
+  background: rgba(0, 0, 0, $opacity);
+  backdrop-filter: blur($blur);
+  border: 1px solid rgba(0, 0, 0, $border-opacity);
+}
+
+// Glass Card Mixin
+@mixin glass-card($padding: $spacing-xl, $radius: $radius-xl) {
+  @include glass-effect();
+  border-radius: $radius;
+  box-shadow: $shadow-lg;
+  padding: $padding;
+  transition: all $transition-normal;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-xl;
+  }
+}
+
+// Glass Button Mixin - Minimalistic
+@mixin glass-button($padding: $spacing-sm $spacing-lg, $radius: $radius-md) {
+  @include glass-effect();
+  border-radius: $radius;
+  padding: $padding;
+  color: $text-primary;
+  font-weight: map.get($font-weights, 'medium');
+  cursor: pointer;
+  transition: all $transition-normal;
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  border: 1px solid $border-glass;
+  text-decoration: none;
+
+  &:hover {
+    @include glass-effect(0.1);
+    border-color: $border-glass-hover;
+    transform: translateY(-1px);
+    box-shadow: $shadow-sm;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Glass Input Mixin - Minimalistic
+@mixin glass-input($padding: $spacing-sm $spacing-md, $radius: $radius-md) {
+  @include glass-effect();
+  border-radius: $radius;
+  padding: $padding;
+  color: $text-primary;
+  transition: all $transition-normal;
+  border: 1px solid $border-glass;
+  outline: none;
+
+  &::placeholder {
+    color: $text-placeholder;
+  }
+
+  &:focus {
+    @include glass-effect(0.1);
+    border-color: $border-glass-active;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Flexbox Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-column-center {
+  @include flex-column;
+  align-items: center;
+  justify-content: center;
+}
+
+// Grid Mixins
+@mixin grid-auto-fit($min-width: 300px, $gap: $spacing-xl) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// Responsive Mixins
+@mixin mobile {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-md) and (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// Animation Mixins
+@mixin fade-in($duration: $transition-normal) {
+  animation: fadeIn $duration ease-in-out;
+}
+
+@mixin slide-up($duration: $transition-normal) {
+  animation: slideUp $duration ease-out;
+}
+
+@mixin spin($duration: 1s) {
+  animation: spin $duration linear infinite;
+}
+
+// Badge Mixin - Minimalistic
+@mixin badge($bg-color, $text-color, $padding: $spacing-xs $spacing-sm) {
+  padding: $padding;
+  border-radius: $radius-full;
+  font-size: map.get($font-sizes, 'sm');
+  font-weight: map.get($font-weights, 'semibold');
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 0, 0.1);
+  color: $text-primary;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+// Status Badge Mixins - Minimalistic
+@mixin status-badge($status) {
+  @include badge(#000000, #000000);
+}
+
+// Method Badge Mixins - Minimalistic
+@mixin method-badge($method) {
+  @include badge(#000000, #000000);
+}
+
+// Loading State Mixin - Minimalistic
+@mixin loading-state {
+  @include flex-column-center;
+  padding: $spacing-xxl $spacing-xl;
+  color: $text-muted;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top: 3px solid $text-primary;
+    border-radius: 50%;
+    @include spin();
+    margin-bottom: $spacing-md;
+  }
+}
+
+// Error State Mixin - Minimalistic
+@mixin error-state {
+  @include flex-column-center;
+  padding: $spacing-xxl $spacing-xl;
+  color: $text-primary;
+
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+  }
+}
+
+// Empty State Mixin - Minimalistic
+@mixin empty-state {
+  @include flex-column-center;
+  padding: $spacing-xxl $spacing-xl;
+  color: $text-muted;
+
+  .empty-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-md;
+  }
+}

@@ -14,6 +14,7 @@ type User struct {
 	Password  string    `json:"-" db:"password"` // Hidden from JSON
 	FirstName string    `json:"first_name" db:"first_name"`
 	LastName  string    `json:"last_name" db:"last_name"`
+	Role      string    `json:"role" db:"role"`
 	IsActive  bool      `json:"is_active" db:"is_active"`
 	CreatedAt time.Time `json:"created_at" db:"created_at"`
 	UpdatedAt time.Time `json:"updated_at" db:"updated_at"`
@@ -26,6 +27,7 @@ type CreateUserRequest struct {
 	Password  string `json:"password" binding:"required,min=8"`
 	FirstName string `json:"first_name" binding:"required,min=2,max=50"`
 	LastName  string `json:"last_name" binding:"required,min=2,max=50"`
+	Role      string `json:"role,omitempty" binding:"omitempty,oneof=admin user"`
 }
 
 // UpdateUserRequest represents the request payload for updating a user
@@ -34,6 +36,7 @@ type UpdateUserRequest struct {
 	Username  *string `json:"username,omitempty" binding:"omitempty,min=3,max=50"`
 	FirstName *string `json:"first_name,omitempty" binding:"omitempty,min=2,max=50"`
 	LastName  *string `json:"last_name,omitempty" binding:"omitempty,min=2,max=50"`
+	Role      *string `json:"role,omitempty" binding:"omitempty,oneof=admin user"`
 	IsActive  *bool   `json:"is_active,omitempty"`
 }
 
@@ -50,6 +53,7 @@ type UserResponse struct {
 	Username  string    `json:"username"`
 	FirstName string    `json:"first_name"`
 	LastName  string    `json:"last_name"`
+	Role      string    `json:"role"`
 	IsActive  bool      `json:"is_active"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -63,11 +67,13 @@ func (u *User) ToResponse() UserResponse {
 		Username:  u.Username,
 		FirstName: u.FirstName,
 		LastName:  u.LastName,
+		Role:      u.Role,
 		IsActive:  u.IsActive,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
 	}
 }
+
 
 
 

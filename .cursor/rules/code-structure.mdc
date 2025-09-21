@@ -1,0 +1,7 @@
+---
+alwaysApply: true
+---
+
+- Controllers do not hold business logic, they only call the services which themselves calls the managers which call the repositories
+- Services only declares functions, they do not implement them, they only call the managers which implements them
+- Managers implement the business logic, sometimes they call the repositories which themselves interact with the database

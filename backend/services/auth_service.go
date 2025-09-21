@@ -1,6 +1,7 @@
 package services
 
 import (
+	"fmt"
 	"time"
 
 	"angular-n-go-template/backend/models"
@@ -56,6 +57,12 @@ func (s *AuthService) Register(req *models.CreateUserRequest) (*models.UserRespo
 		return nil, err
 	}
 
+	// Set default role if not provided
+	role := req.Role
+	if role == "" {
+		role = "user"
+	}
+
 	// Create user
 	user := &models.User{
 		ID:        uuid.New(),
@@ -64,6 +71,7 @@ func (s *AuthService) Register(req *models.CreateUserRequest) (*models.UserRespo
 		Password:  hashedPassword,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
+		Role:      role,
 		IsActive:  true,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
@@ -100,8 +108,19 @@ func (s *AuthService) Login(req *models.LoginRequest) (*LoginResponse, error) {
 		return nil, &ValidationError{Message: "Invalid email or password"}
 	}
 
+	// Ensure user has a valid role (fix for existing users with empty roles)
+	if user.Role == "" {
+		user.Role = "user"
+		// Update the user in the database
+		err = s.userRepo.Update(user)
+		if err != nil {
+			// Log the error but don't fail the login
+			fmt.Printf("Warning: Failed to update user role: %v\n", err)
+		}
+	}
+
 	// Generate JWT token
-	token, err := security.GenerateToken(user.ID, user.Email, user.Username)
+	token, err := security.GenerateToken(user.ID, user.Email, user.Username, user.Role)
 	if err != nil {
 		return nil, err
 	}

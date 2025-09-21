@@ -1,0 +1,228 @@
+@use 'sass:map';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use '../../../styles/typography' as *;
+
+.dashboard-container {
+  min-height: 100vh;
+  background: $bg-primary;
+  font-family: $font-primary;
+
+  .header {
+    @include glass-effect(0.1, 20px, 0.2);
+    padding: $spacing-lg $spacing-xl;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+    .header-content {
+      @include flex-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+      gap: $spacing-md;
+
+      .title {
+        @include heading-style('2xl', 'bold', $text-primary);
+        margin: 0;
+      }
+
+      .user-info {
+        @include flex-center;
+        gap: $spacing-md;
+        flex-wrap: wrap;
+
+        .user-name {
+          @include body-text('base', $text-secondary);
+        }
+
+        .role-badge {
+          @include badge(#000000, #000000);
+        }
+
+        .logout-btn {
+          @include glass-button($spacing-sm $spacing-md, $radius-md);
+          
+          &:hover {
+            background: rgba(0, 0, 0, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  .main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: $spacing-xl;
+  }
+
+  .welcome-section {
+    text-align: center;
+    margin-bottom: $spacing-xxl;
+
+    h2 {
+      @include heading-style('3xl', 'bold', $text-primary);
+      margin-bottom: $spacing-md;
+    }
+
+    .subtitle {
+      @include body-text('lg', $text-secondary);
+      margin-bottom: $spacing-xl;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .user-details {
+      @include glass-card($spacing-xl, $radius-lg);
+      max-width: 500px;
+      margin: 0 auto;
+      @include grid-auto-fit(150px, $spacing-md);
+
+      .detail {
+        @include flex-column;
+        gap: $spacing-xs;
+
+        .label {
+          @include caption-text($text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .value {
+          @include body-text('base', $text-primary);
+          font-weight: map.get($font-weights, 'medium');
+
+          &.role {
+            @include badge(#000000, #000000);
+            display: inline-block;
+            margin-top: $spacing-xs;
+          }
+        }
+      }
+    }
+  }
+
+  .features-section {
+    margin-bottom: $spacing-xxl;
+
+    h3 {
+      @include heading-style('2xl', 'semibold', $text-primary);
+      text-align: center;
+      margin-bottom: $spacing-xl;
+    }
+
+    .features-grid {
+      @include grid-auto-fit(280px, $spacing-lg);
+
+      .feature-card {
+        @include glass-card($spacing-lg, $radius-lg);
+        text-align: center;
+        transition: all $transition-normal;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: $shadow-xl;
+        }
+
+        h4 {
+          @include heading-style('lg', 'semibold', $text-primary);
+          margin-bottom: $spacing-md;
+        }
+
+        p {
+          @include body-text('base', $text-secondary);
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .admin-section {
+    .admin-card {
+      @include glass-card($spacing-xl, $radius-lg);
+      text-align: center;
+
+      h3 {
+        @include heading-style('xl', 'semibold', $text-primary);
+        margin-bottom: $spacing-md;
+      }
+
+      p {
+        @include body-text('base', $text-secondary);
+        margin-bottom: $spacing-lg;
+      }
+
+      .admin-link {
+        @include glass-button($spacing-md $spacing-lg, $radius-md);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-sm;
+
+        &:hover {
+          background: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+
+  .loading-state {
+    @include loading-state();
+  }
+
+  .error-state {
+    @include error-state();
+    gap: $spacing-md;
+
+    .btn {
+      @include glass-button($spacing-sm $spacing-lg, $radius-md);
+      margin-top: $spacing-md;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+
+  @include mobile {
+    .header {
+      padding: $spacing-md;
+
+      .header-content {
+        @include flex-column;
+        text-align: center;
+        gap: $spacing-md;
+
+        .user-info {
+          @include flex-column;
+          gap: $spacing-sm;
+        }
+      }
+    }
+
+    .main-content {
+      padding: $spacing-md;
+    }
+
+    .welcome-section {
+      margin-bottom: $spacing-xl;
+
+      h2 {
+        @include heading-style('2xl', 'bold', $text-primary);
+      }
+
+      .user-details {
+        @include grid-auto-fit(120px, $spacing-sm);
+        padding: $spacing-lg;
+      }
+    }
+
+    .features-section {
+      margin-bottom: $spacing-xl;
+
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}

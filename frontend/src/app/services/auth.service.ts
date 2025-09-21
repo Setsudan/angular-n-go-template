@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject, tap } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, tap, catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../environments/environment';
+import { RBACService, DEFAULT_RBAC_CONFIG } from '../config/rbac.config';
 
 export interface User {
   id: string;
@@ -10,6 +11,7 @@ export interface User {
   username: string;
   first_name: string;
   last_name: string;
+  role: string;
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -26,6 +28,7 @@ export interface RegisterRequest {
   password: string;
   first_name: string;
   last_name: string;
+  role?: string;
 }
 
 export interface LoginResponse {
@@ -40,35 +43,60 @@ export interface ApiResponse<T> {
   request_id: string;
 }
 
+export interface BackendApiResponse<T> {
+  requestId: string;
+  timestamp: string;
+  data: T;
+  status: string;
+  error?: {
+    code: string;
+    message: string;
+    details?: string;
+  };
+}
+
+export interface ApiError {
+  success: false;
+  message: string;
+  errors?: { [key: string]: string[] };
+  request_id: string;
+}
+
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
   private readonly API_URL = environment.apiUrl;
+  private readonly rbacService = new RBACService(DEFAULT_RBAC_CONFIG);
   private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private isInitializedSubject = new BehaviorSubject<boolean>(false);
   public currentUser$ = this.currentUserSubject.asObservable();
+  public isInitialized$ = this.isInitializedSubject.asObservable();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor() {
     this.loadUserFromStorage();
   }
 
-  login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    return this.http.post<ApiResponse<LoginResponse>>(`${this.API_URL}/auth/login`, credentials)
+  login(credentials: LoginRequest): Observable<BackendApiResponse<LoginResponse>> {
+    return this.http
+      .post<BackendApiResponse<LoginResponse>>(`${this.API_URL}/auth/login`, credentials)
       .pipe(
         tap(response => {
-          if (response.success) {
+          if (response.status === 'success' && response.data) {
             localStorage.setItem('token', response.data.token);
             this.currentUserSubject.next(response.data.user);
           }
-        })
+        }),
+        catchError(this.handleError)
       );
   }
 
-  register(userData: RegisterRequest): Observable<ApiResponse<User>> {
-    return this.http.post<ApiResponse<User>>(`${this.API_URL}/auth/register`, userData);
+  register(userData: RegisterRequest): Observable<BackendApiResponse<User>> {
+    return this.http
+      .post<BackendApiResponse<User>>(`${this.API_URL}/auth/register`, userData)
+      .pipe(catchError(this.handleError));
   }
 
   logout(): void {
@@ -77,8 +105,10 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 
-  getProfile(): Observable<ApiResponse<User>> {
-    return this.http.get<ApiResponse<User>>(`${this.API_URL}/auth/profile`);
+  getProfile(): Observable<BackendApiResponse<User>> {
+    return this.http
+      .get<BackendApiResponse<User>>(`${this.API_URL}/auth/profile`)
+      .pipe(catchError(this.handleError));
   }
 
   getToken(): string | null {
@@ -94,19 +124,96 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  hasRole(role: string): boolean {
+    const user = this.getCurrentUser();
+    return user ? user.role === role : false;
+  }
+
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  isUser(): boolean {
+    return this.hasRole('user');
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    const user = this.getCurrentUser();
+    return user ? this.rbacService.hasAnyRole(user.role, roles) : false;
+  }
+
+  hasPermission(permission: string): boolean {
+    const user = this.getCurrentUser();
+    return user ? this.rbacService.hasPermission(user.role, permission) : false;
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    const user = this.getCurrentUser();
+    return user ? this.rbacService.hasAnyPermission(user.role, permissions) : false;
+  }
+
+  hasAllPermissions(permissions: string[]): boolean {
+    const user = this.getCurrentUser();
+    return user ? this.rbacService.hasAllPermissions(user.role, permissions) : false;
+  }
+
+  canAccessRoute(routePath: string): boolean {
+    const user = this.getCurrentUser();
+    return user ? this.rbacService.canAccessRoute(user.role, routePath) : false;
+  }
+
+  getRBACService(): RBACService {
+    return this.rbacService;
+  }
+
   private loadUserFromStorage(): void {
     const token = this.getToken();
     if (token) {
       this.getProfile().subscribe({
-        next: (response) => {
-          if (response.success) {
+        next: response => {
+          if (response.status === 'success' && response.data) {
             this.currentUserSubject.next(response.data);
           }
+          this.isInitializedSubject.next(true);
         },
-        error: () => {
+        error: error => {
+          console.error('Failed to load user profile:', error);
           this.logout();
-        }
+          this.isInitializedSubject.next(true);
+        },
       });
+    } else {
+      this.isInitializedSubject.next(true);
     }
   }
+
+  private handleError = (error: HttpErrorResponse): Observable<never> => {
+    let errorMessage = 'An unexpected error occurred';
+
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Client Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      if (error.error && error.error.message) {
+        errorMessage = error.error.message;
+      } else if (error.status === 0) {
+        errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      } else if (error.status === 401) {
+        errorMessage = 'Authentication failed. Please login again.';
+        this.logout();
+      } else if (error.status === 403) {
+        errorMessage = 'Access denied. You do not have permission to perform this action.';
+      } else if (error.status === 404) {
+        errorMessage = 'The requested resource was not found.';
+      } else if (error.status === 500) {
+        errorMessage = 'Internal server error. Please try again later.';
+      } else {
+        errorMessage = `Server Error: ${error.status} - ${error.statusText}`;
+      }
+    }
+
+    console.error('Auth Service Error:', error);
+    return throwError(() => new Error(errorMessage));
+  };
 }

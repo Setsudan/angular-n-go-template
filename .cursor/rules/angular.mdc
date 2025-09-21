@@ -1,0 +1,27 @@
+---
+
+
+alwaysApply: true
+
+
+---
+
+
+
+
+
+- frontend use angular 20
+- always use modern angular features
+- preferably use the angular cli to generate boilerplate code
+- always use the angular cli to generate components, services, pipes, directives, guards, interceptors, resolvers
+- always use the angular cli to generate e2e tests
+- always use the angular cli to generate unit tests
+- always use the angular cli to generate integration tests
+- always use the angular cli to generate performance tests
+- always use the angular cli to generate accessibility tests
+- always use the angular cli to generate security tests
+- all components should be standalone
+- always prefer using the components already made instead of using base html tags
+- when creating a service that interacts with the backend, always use the http client
+- always have template, scss and typescript in their own respective files
+- always write the test files when creating new services or components

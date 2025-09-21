@@ -1,0 +1,9 @@
+---
+alwaysApply: true
+---
+
+
+- usage of type any is forbidden
+- usage of eslint is mandatory
+- formatting using prettier is mandatory
+- before saying the code is done, make sure the code is linted and formatted

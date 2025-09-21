@@ -54,6 +54,54 @@ func (s *RequestLogService) GetRecentRequestLogs(ctx context.Context, limit int)
 	return s.requestLogRepo.GetRecent(ctx, limit)
 }
 
+// GetRecentLogs retrieves recent request logs (admin method)
+func (s *RequestLogService) GetRecentLogs(limit int) ([]*models.RequestLog, error) {
+	ctx := context.Background()
+	return s.requestLogRepo.GetRecent(ctx, limit)
+}
+
+// GetLogsByUser retrieves request logs for a specific user (admin method)
+func (s *RequestLogService) GetLogsByUser(userIDStr string, limit int) ([]*models.RequestLog, error) {
+	ctx := context.Background()
+	userID, err := uuid.Parse(userIDStr)
+	if err != nil {
+		return nil, err
+	}
+	return s.requestLogRepo.GetByUserID(ctx, userID, limit)
+}
+
+// GetSystemStats retrieves system statistics (admin method)
+func (s *RequestLogService) GetSystemStats() (map[string]interface{}, error) {
+	ctx := context.Background()
+	
+	// Get recent logs to calculate stats
+	logs, err := s.requestLogRepo.GetRecent(ctx, 1000)
+	if err != nil {
+		return nil, err
+	}
+
+	// Calculate basic stats
+	totalRequests := len(logs)
+	statusCodes := make(map[int]int)
+	methods := make(map[string]int)
+	paths := make(map[string]int)
+	
+	for _, log := range logs {
+		statusCodes[log.StatusCode]++
+		methods[log.Method]++
+		paths[log.Path]++
+	}
+
+	return map[string]interface{}{
+		"total_requests": totalRequests,
+		"status_codes":   statusCodes,
+		"methods":        methods,
+		"top_paths":      paths,
+		"timestamp":      time.Now(),
+	}, nil
+}
+
+
 
 
 

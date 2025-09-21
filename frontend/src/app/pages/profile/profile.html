@@ -1,0 +1,25 @@
+<div class="profile">
+  <h2>User Profile</h2>
+  
+  <div *ngIf="getCurrentUser()" class="profile-info">
+    <div class="profile-field">
+      <label>Username:</label>
+      <span>{{ getCurrentUser()?.username }}</span>
+    </div>
+    
+    <div class="profile-field">
+      <label>Email:</label>
+      <span>{{ getCurrentUser()?.email }}</span>
+    </div>
+    
+    <div class="profile-field">
+      <label>Role:</label>
+      <span>{{ getCurrentUser()?.role }}</span>
+    </div>
+    
+    <div class="profile-field">
+      <label>Created:</label>
+      <span>{{ getCurrentUser()?.created_at | date }}</span>
+    </div>
+  </div>
+</div>

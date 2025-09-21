@@ -1,0 +1,198 @@
+@use 'variables' as *;
+@use 'mixins' as *;
+@use 'typography' as *;
+
+// Global Styles
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: $font-primary;
+  background: $bg-primary;
+  color: $text-primary;
+}
+
+// Common Layout Classes
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 $spacing-md;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+.flex-column {
+  @include flex-column;
+}
+
+.flex-column-center {
+  @include flex-column-center;
+}
+
+.grid {
+  display: grid;
+}
+
+.grid-auto-fit {
+  @include grid-auto-fit();
+}
+
+// Spacing Utilities
+.p-0 { padding: 0; }
+.p-1 { padding: $spacing-xs; }
+.p-2 { padding: $spacing-sm; }
+.p-3 { padding: $spacing-md; }
+.p-4 { padding: $spacing-lg; }
+.p-5 { padding: $spacing-xl; }
+
+.m-0 { margin: 0; }
+.m-1 { margin: $spacing-xs; }
+.m-2 { margin: $spacing-sm; }
+.m-3 { margin: $spacing-md; }
+.m-4 { margin: $spacing-lg; }
+.m-5 { margin: $spacing-xl; }
+
+.mb-1 { margin-bottom: $spacing-xs; }
+.mb-2 { margin-bottom: $spacing-sm; }
+.mb-3 { margin-bottom: $spacing-md; }
+.mb-4 { margin-bottom: $spacing-lg; }
+.mb-5 { margin-bottom: $spacing-xl; }
+
+.mt-1 { margin-top: $spacing-xs; }
+.mt-2 { margin-top: $spacing-sm; }
+.mt-3 { margin-top: $spacing-md; }
+.mt-4 { margin-top: $spacing-lg; }
+.mt-5 { margin-top: $spacing-xl; }
+
+// Common Component Classes
+.glass-card {
+  @include glass-card();
+}
+
+.glass-button {
+  @include glass-button();
+}
+
+.glass-input {
+  @include glass-input();
+}
+
+.loading-state {
+  @include loading-state();
+}
+
+.error-state {
+  @include error-state();
+}
+
+.empty-state {
+  @include empty-state();
+}
+
+// Status Classes
+.status-success {
+  @include status-badge('success');
+}
+
+.status-warning {
+  @include status-badge('warning');
+}
+
+.status-error {
+  @include status-badge('error');
+}
+
+.status-info {
+  @include status-badge('info');
+}
+
+// Method Classes
+.method-get {
+  @include method-badge('get');
+}
+
+.method-post {
+  @include method-badge('post');
+}
+
+.method-put {
+  @include method-badge('put');
+}
+
+.method-delete {
+  @include method-badge('delete');
+}
+
+// Responsive Utilities
+.hidden-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.hidden-desktop {
+  @include desktop {
+    display: none !important;
+  }
+}
+
+// Animation Keyframes
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Focus Styles
+*:focus {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
+}
+
+// Scrollbar Styles
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: $radius-sm;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: $radius-sm;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+}

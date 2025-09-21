@@ -1,0 +1,89 @@
+@use 'sass:map';
+@use 'variables' as *;
+
+// Font Families
+$font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-mono: 'Monaco', 'Menlo', monospace;
+
+// Font Sizes
+$font-sizes: (
+  'xs': 0.75rem,
+  'sm': 0.875rem,
+  'base': 1rem,
+  'lg': 1.125rem,
+  'xl': 1.25rem,
+  '2xl': 1.5rem,
+  '3xl': 1.875rem,
+  '4xl': 2.25rem,
+  '5xl': 3rem
+);
+
+// Font Weights
+$font-weights: (
+  'light': 300,
+  'normal': 400,
+  'medium': 500,
+  'semibold': 600,
+  'bold': 700,
+  'extrabold': 800
+);
+
+// Line Heights
+$line-heights: (
+  'tight': 1.25,
+  'snug': 1.375,
+  'normal': 1.5,
+  'relaxed': 1.625,
+  'loose': 2
+);
+
+// Typography Mixins
+@mixin text-style($size: 'base', $weight: 'normal', $color: $text-primary, $line-height: 'normal') {
+  font-size: map.get($font-sizes, $size);
+  font-weight: map.get($font-weights, $weight);
+  color: $color;
+  line-height: map.get($line-heights, $line-height);
+}
+
+@mixin heading-style($size: '2xl', $weight: 'bold', $color: $text-primary) {
+  @include text-style($size, $weight, $color, 'tight');
+  margin: 0;
+}
+
+@mixin body-text($size: 'base', $color: $text-secondary) {
+  @include text-style($size, 'normal', $color, 'normal');
+}
+
+@mixin caption-text($color: $text-muted) {
+  @include text-style('sm', 'normal', $color, 'normal');
+}
+
+@mixin mono-text($size: 'sm', $color: $text-muted) {
+  font-family: $font-mono;
+  @include text-style($size, 'normal', $color, 'normal');
+}
+
+// Common Typography Classes
+.text-xs { @include text-style('xs'); }
+.text-sm { @include text-style('sm'); }
+.text-base { @include text-style('base'); }
+.text-lg { @include text-style('lg'); }
+.text-xl { @include text-style('xl'); }
+.text-2xl { @include text-style('2xl'); }
+.text-3xl { @include text-style('3xl'); }
+.text-4xl { @include text-style('4xl'); }
+.text-5xl { @include text-style('5xl'); }
+
+.font-light { font-weight: map.get($font-weights, 'light'); }
+.font-normal { font-weight: map.get($font-weights, 'normal'); }
+.font-medium { font-weight: map.get($font-weights, 'medium'); }
+.font-semibold { font-weight: map.get($font-weights, 'semibold'); }
+.font-bold { font-weight: map.get($font-weights, 'bold'); }
+.font-extrabold { font-weight: map.get($font-weights, 'extrabold'); }
+
+.text-primary { color: $text-primary; }
+.text-secondary { color: $text-secondary; }
+.text-muted { color: $text-muted; }
+.text-placeholder { color: $text-placeholder; }
+
+.mono { font-family: $font-mono; }

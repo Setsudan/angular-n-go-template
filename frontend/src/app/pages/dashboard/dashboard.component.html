@@ -1,0 +1,82 @@
+<div class="dashboard-container">
+  <!-- Loading State -->
+  <div *ngIf="!(isInitialized$ | async)" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading...</p>
+  </div>
+
+  <!-- Main Content -->
+  <div *ngIf="isInitialized$ | async">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="title">Dashboard</h1>
+        <div class="user-info" *ngIf="currentUser$ | async as user">
+          <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+          <span class="role-badge" [class.admin]="user.role === 'admin'">{{ user.role }}</span>
+          <button class="logout-btn" (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Section -->
+      <section class="welcome-section">
+        <h2>Welcome to Angular + Go Template</h2>
+        <p class="subtitle">A full-stack application template with authentication, RBAC, and admin features.</p>
+        
+        <div class="user-details" *ngIf="currentUser$ | async as user">
+          <div class="detail">
+            <span class="label">Email</span>
+            <span class="value">{{ user.email }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Username</span>
+            <span class="value">{{ user.username }}</span>
+          </div>
+          <div class="detail">
+            <span class="label">Role</span>
+            <span class="value role" [class.admin]="user.role === 'admin'">{{ user.role }}</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Template Features -->
+      <section class="features-section">
+        <h3>Template Features</h3>
+        <div class="features-grid">
+          <div class="feature-card">
+            <h4>Authentication</h4>
+            <p>JWT-based authentication with secure login/logout</p>
+          </div>
+          <div class="feature-card">
+            <h4>Role-Based Access</h4>
+            <p>RBAC system with admin and user roles</p>
+          </div>
+          <div class="feature-card">
+            <h4>Admin Dashboard</h4>
+            <p>System monitoring and user management</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Admin Access -->
+      <section *ngIf="currentUser$ | async as user; else noUser" class="admin-section">
+        <div *ngIf="user.role === 'admin'" class="admin-card">
+          <h3>Admin Access</h3>
+          <p>Access the admin dashboard to manage users and view system statistics.</p>
+          <a routerLink="/admin" class="admin-link">Go to Admin Dashboard</a>
+        </div>
+      </section>
+      
+      <ng-template #noUser>
+        <!-- This should not be visible due to auth guard, but just in case -->
+        <div class="error-state">
+          <p>No user data available. Please login again.</p>
+          <button class="btn primary" (click)="logout()">Go to Login</button>
+        </div>
+      </ng-template>
+    </main>
+  </div>
+</div>

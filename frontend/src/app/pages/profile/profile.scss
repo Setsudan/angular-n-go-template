@@ -1,0 +1,54 @@
+@use 'sass:map';
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+@use '../../../styles/typography' as *;
+
+.profile {
+  min-height: 100vh;
+  background: $bg-primary;
+  padding: $spacing-xl;
+  font-family: $font-primary;
+
+  h2 {
+    @include heading-style('3xl', 'bold', $text-primary);
+    margin-bottom: $spacing-xl;
+    text-align: center;
+  }
+
+  .profile-info {
+    max-width: 600px;
+    margin: 0 auto;
+    @include glass-card();
+
+    .profile-field {
+      @include flex-between;
+      padding: $spacing-md 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      label {
+        @include body-text('base', $text-secondary);
+        font-weight: map.get($font-weights, 'medium');
+        min-width: 120px;
+      }
+
+      span {
+        @include body-text('base', $text-primary);
+        font-weight: map.get($font-weights, 'semibold');
+      }
+    }
+  }
+
+  @include mobile {
+    padding: $spacing-md;
+
+    .profile-field {
+      @include flex-column;
+      gap: $spacing-sm;
+      text-align: center;
+    }
+  }
+}

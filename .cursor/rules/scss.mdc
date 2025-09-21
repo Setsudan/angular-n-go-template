@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+- use mixins for reusable styles
+- use variables for reusable values
+- use functions for reusable calculations
+- use @use 'sass:map' to access map values
+- use @use 'sass:math' to access math functions
+- use @use 'sass:string' to access string functions
+- use @use 'sass:list' to access list functions
+- use @use 'sass:color' to access color functions
+- never use @import use @use
+- never use hardcoded hex colors or css variables, use the file variables.scss to access the colors
+- never hardcode font sizes or text colors, the typography.scss files handles this
+- avoid duplication of code the globals.scss or mixins.scss is for that
