@@ -99,3 +99,4 @@ func (c *AdminController) GetSystemStats(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, models.SuccessResponse(requestID, stats))
 }
+

@@ -81,3 +81,4 @@ func (s *AdminSeedService) SeedDefaultAdmin() error {
 	log.Printf("Default admin account created successfully: %s (%s)", adminUsername, adminEmail)
 	return nil
 }
+

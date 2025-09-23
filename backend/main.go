@@ -1,20 +1,20 @@
 package main
 
 import (
-	"log"
-	"os"
+    "log"
+    "os"
 
-	"angular-n-go-template/backend/config"
-	"angular-n-go-template/backend/controllers"
-	"angular-n-go-template/backend/middleware"
-	"angular-n-go-template/backend/rbac"
-	"angular-n-go-template/backend/repositories"
-	"angular-n-go-template/backend/security"
-	"angular-n-go-template/backend/services"
+    "angular-n-go-template/backend/config"
+    "angular-n-go-template/backend/controllers"
+    "angular-n-go-template/backend/middleware"
+    "angular-n-go-template/backend/rbac"
+    "angular-n-go-template/backend/repositories"
+    "angular-n-go-template/backend/security"
+    "angular-n-go-template/backend/services"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+    "github.com/gin-contrib/cors"
+    "github.com/gin-gonic/gin"
+    "github.com/joho/godotenv"
 )
 
 func main() {
@@ -51,8 +51,17 @@ func main() {
 	userController := controllers.NewUserController(userService, requestLogService)
 	adminController := controllers.NewAdminController(requestLogService)
 
-	// Initialize RBAC configuration
-	rbacConfig := rbac.DefaultRBACConfig()
+    // Initialize RBAC configuration from file with fallback to defaults
+    rbacPath := os.Getenv("RBAC_CONFIG_PATH")
+    if rbacPath == "" {
+        rbacPath = "backend/config/rbac.json"
+    }
+
+    rbacConfig, err := rbac.LoadRBACConfigFromFile(rbacPath)
+    if err != nil {
+        log.Printf("Failed to load RBAC config from %s: %v. Falling back to default RBAC config.", rbacPath, err)
+        rbacConfig = rbac.DefaultRBACConfig()
+    }
 
 	// Initialize Gin router
 	router := gin.Default()

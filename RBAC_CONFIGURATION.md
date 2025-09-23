@@ -370,3 +370,4 @@ if rbacConfig.HasPermission(userRole, "admin.logs.read") {
 3. **Use HTTPS** for configuration loading
 4. **Regular audits** of permissions and roles
 5. **Principle of least privilege** - give minimum required permissions
+

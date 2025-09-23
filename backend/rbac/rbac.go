@@ -1,7 +1,9 @@
 package rbac
 
 import (
-	"sync"
+    "encoding/json"
+    "os"
+    "sync"
 )
 
 // Role represents a user role with its permissions
@@ -204,3 +206,28 @@ func (r *RBACConfig) GetPermission(permissionName string) (*Permission, bool) {
 	permission, exists := r.Permissions[permissionName]
 	return permission, exists
 }
+
+// LoadRBACConfigFromFile reads an RBAC configuration from a JSON file.
+// Returns the parsed configuration or an error if the file cannot be read or parsed.
+func LoadRBACConfigFromFile(filename string) (*RBACConfig, error) {
+    data, err := os.ReadFile(filename)
+    if err != nil {
+        return nil, err
+    }
+
+    var cfg RBACConfig
+    if err := json.Unmarshal(data, &cfg); err != nil {
+        return nil, err
+    }
+
+    // Ensure maps are initialized to avoid nil map access
+    if cfg.Roles == nil {
+        cfg.Roles = make(map[string]*Role)
+    }
+    if cfg.Permissions == nil {
+        cfg.Permissions = make(map[string]*Permission)
+    }
+
+    return &cfg, nil
+}
+

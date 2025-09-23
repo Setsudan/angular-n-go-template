@@ -31,6 +31,8 @@ COPY --from=builder /app/main .
 
 # Copy migration files
 COPY --from=builder /app/migrations ./migrations
+# Copy config files (RBAC JSON, etc.)
+COPY --from=builder /app/config ./config
 
 # Expose port
 EXPOSE 8080

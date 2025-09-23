@@ -223,3 +223,4 @@ export class RBACService {
     delete this.config.permissions[permissionName];
   }
 }
+
